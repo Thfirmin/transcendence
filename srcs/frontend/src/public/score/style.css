@@ -1,0 +1,17 @@
+body {
+	font-family: 'Courier New', Courier, monospace;
+}
+
+#main-painel {
+	margin-top: 100px;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+}
+
+.painel {
+	background-color: gray;
+	font-size: 225px;
+	border: solid 1px black;
+	padding: 0 100px;
+}

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Django - Scoring</title>
+		<link rel="preload" href="./style.css" as="style" onload="this.rel='stylesheet'">
+	</head>
+	<body>
+		<header>
+			<h1>Scoring</h1>
+		</header>
+
+		<hr />
+
+		<main>
+			<p>
+				<span>
+					Press "K" to increment ou "I" to decrement manually the <strong>A</strong> value
+				</span>
+				<br />
+				<span>
+					The <strong>B</strong> value'll be automatically incremented
+				</span>
+			</p>
+			<br />
+			<div id="main-painel">
+				<div class="painel">
+					<span>
+						A
+					</span>
+					<br />
+					<strong>
+						<span id="a-score">
+							0
+						</span>
+					</strong>
+				</div>
+				<div class="painel">
+					<span>
+						B
+					</span>
+					<br />
+					<strong>
+						<span id="b-socre">
+								0
+						</span>
+					</strong>
+				</div>
+			</div>
+		</main>
+
+		<hr />
+
+		<footer>
+			<span>
+				Score app make with django - Thiago F. dos S. (Thfirmin) - 09/2024.
+			</span>
+			<br />
+			<span>
+				Return back to <a href="/">home</a>
+			</span>
+		</footer>
+	</body>
+	<script type="module" src="./index.js"></script>
+</html>
