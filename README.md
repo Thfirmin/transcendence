@@ -3,9 +3,9 @@
 
 <a href="/">
 	<picture>
-		<source media="(prefers-color-scheme: dark)" srcset="/.github/img/42template_dark.png">
-		<source media="(prefers-color-scheme: light)" srcset="/.github/img/42template_light.png">
-		<img alt="42 Header" src="/.github/img/42template_light.png">
+		<source media="(prefers-color-scheme: dark)" srcset="/.github/img/ft_transcendence_dark.svg">
+		<source media="(prefers-color-scheme: light)" srcset="/.github/img/ft_transcendence_light.svg">
+		<img alt="42 Header" src="/.github/img/ft_transcendence_light.svg">
 	</picture>
 </a>
 
@@ -13,7 +13,7 @@
 
 </div>
 
-# 42Template
+# FT Transcendence
 
 > Intro
 
@@ -47,7 +47,7 @@ Technologies and methodologies used to build this project are listed below:
 ---
 
 See more detailed explanations of the project on the Wiki page.   
-Go to 42Template [Wiki page][wiki].   
+Go to FT Transcendence [Wiki page][wiki].   
 
 **Author:** [Thiago Firmino dos S.][thfirmin]   
 **Institution:** [42|Rio][42rio]   
@@ -64,12 +64,12 @@ Go to 42Template [Wiki page][wiki].
 > This repository is under the _**Apache license**_, read more about [here](/LICENSE)   
 > **_Keep Swimming!_**   
 
-#### _42template - 42|Rio - thfirmin_
+#### _ft_transcendence - 42|Rio - thfirmin_
 ---
 
 <!-- Links -->
 [42pdh]:<https://github.com/gawbsouza/42-pdh>
-[wiki]:<https://github.com/Thfirmin/42template/wiki>
+[wiki]:<https://github.com/Thfirmin/ft_transcendence/wiki>
 [thfirmin]:<https://github.com/Thfirmin>
 [42rio]:<https://42.rio>
 [markdown]:<https://daringfireball.net/projects/markdown>
