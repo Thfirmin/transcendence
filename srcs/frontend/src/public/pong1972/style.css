@@ -1,0 +1,35 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	color: white;
+}
+
+body {
+	font-family: 'Courier New', Courier, monospace;
+	background-color: black;
+}
+
+header, h1 {
+	text-align: center;
+}
+
+#main-div {
+	margin-top: 100px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	max-width: 800px;
+}
+
+.pong-game {
+	background-color: gray;
+	font-size: 225px;
+	border: solid 1px black;
+	padding: 0 100px;
+}
+
+footer, span {
+	text-align: center;
+	margin-top: 50px;
+}

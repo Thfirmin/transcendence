@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Pong 3D - Three.js</title>
+		<link rel="preload" href="./style.css" as="style" onload="this.rel='stylesheet'">
+	</head>
+	<body>
+		<header>
+			<h1>DJANGO - PONG 3D</h1>
+		</header>
+
+		<hr />
+
+		<main>
+			<div id="formulary">
+				<label for="username">Username</label>
+				<input type="text" id="username" name="player1" placeholder="Player 1" required>
+				<button onclick="onLogin()">Start Game</button>
+			</div>
+			<div id="game"></div>
+		</main>
+
+		<hr />
+
+		<footer>
+			<span>
+				Pong 3d app make with django - Thiago F. dos S. (Thfirmin) / Thawan Camara (tde-souz) / Pablo Vieira (pvieira-) / Vanessa Chastinet (vchastin) - 09/2024.
+			</span>
+			<br />
+			<span>
+				Return back to <a href="/">home</a>
+			</span>
+		</footer>
+	</body>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js"></script>
+	<script src="pong3d.js"></script>
+	<script src="login.js"></script>
+</html>
