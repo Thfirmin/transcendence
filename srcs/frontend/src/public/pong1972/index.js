@@ -1,33 +1,46 @@
 const mainId = "main-div";
+let LoginData; // Dados de login do usuário
+
 // Função para obter os dados de login do localStorage
-function getLoginData() {
-	const rawJsonData = localStorage.getItem('loginData');
-	if (!rawJsonData) return null;
-	return JSON.parse(rawJsonData).message;
+async function getLoginData() {
+	const token = localStorage.getItem('token');
+	if (!token) return null;
+
+	try {
+		const response = await fetch(`http://25.45.252.73:3001/user/${token}`);
+		const loginData = await response.json();
+		console.log("getLoginData: ", loginData.data);
+		return loginData.data;
+	} catch (error) {
+		console.error('Erro ao buscar dados de login:', error);
+		return null;
+	}
 }
 
 // Função para renderizar o formulário de login ou o jogo dependendo do estado
 function renderLogin() {
-	const loginData = getLoginData();
-	if (loginData) {
-		startPong(mainId); // Se já estiver logado, iniciar o jogo
-		return;
-	}
+	getLoginData().then(data => {
+		if (data) {
+			LoginData = data;
+			BeginGame(); // Se já estiver logado, iniciar o jogo
+			return;
+		}
 
-	const login = document.getElementById(mainId);
-	login.innerHTML = `
-		<div style="text-align: center; max-width: 300px; margin: 0 auto;">
-			<h1>Login</h1>
-			<input type="text" id="username" placeholder="Username" style="color: black; margin: 10px 0; padding: 5px;">
-			<button id="loginButton" style="color: black; margin: 10px 0; padding: 5px;">Login</button>
-		</div>
-	`;
+		const login = document.getElementById(mainId);
+		login.innerHTML = `
+			<div style="text-align: center; max-width: 300px; margin: 0 auto;">
+				<h1>Login</h1>
+				<input type="text" id="username" placeholder="Username" style="color: black; margin: 10px 0; padding: 5px;">
+				<button id="loginButton" style="color: black; margin: 10px 0; padding: 5px;">Login</button>
+			</div>
+		`;
 
-	// Adicionando evento ao botão de login de forma mais limpa
-	document.getElementById('loginButton').addEventListener('click', onLogin);
+		// Adicionando evento ao botão de login de forma mais limpa
+		document.getElementById('loginButton').addEventListener('click', onLogin);
+	});
 }
 
-// Função de login com async/await para facilitar a leitura
+// Função de login com async/await
 async function onLogin() {
 	const username = document.getElementById('username').value;
 	try {
@@ -39,38 +52,65 @@ async function onLogin() {
 
 		if (response.status === 201) {
 			const data = await response.json();
-			localStorage.setItem('loginData', JSON.stringify(data));
-			console.log('Login successful');
-			startPong("main-div"); // Iniciar o jogo após o login
+			localStorage.setItem('token', data.data);
+			LoginData = data.data;
+			BeginGame(); // Iniciar o jogo após o login
 		} else {
-			alert('Login failed');
+			alert('Login falhou');
 		}
 	} catch (error) {
-		console.error('Error:', error);
+		console.error('Erro no login:', error);
 	}
 }
 
-// Função de logout com async/await
-async function onLogout() {
-	const loginData = getLoginData();
-	if (!loginData) return;
+// Função de logout
+function onLogout() {
+	localStorage.removeItem('token');
+	console.log('Logout successful');
+	renderLogin(); // Retornar à tela de login
+}
 
+// Função para iniciar o jogo após conectar-se à API e ao WebSocket
+async function BeginGame() {
 	try {
-		const response = await fetch('http://25.45.252.73:3001/logout/', {
-			method: 'DELETE',
+		// Conectar na API geradora de salas e obter o matchId
+		const response = await fetch('http://25.45.252.73:8000/pong/match/', {
+			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ username: loginData.username })
+			body: JSON.stringify({
+				username: LoginData.username,
+				token: localStorage.getItem('token')
+			})
 		});
 
-		if (response.status === 201) {
-			localStorage.removeItem('loginData');
-			console.log('Logout successful');
-			renderLogin("main-div"); // Retornar à tela de login após o logout
-		} else {
-			alert('Logout failed');
-		}
+		const data = await response.json();
+		console.log("Match data: ", data);
+
+		// Conectar ao WebSocket com o matchId retornado pela API
+		const matchId = data.matchId;
+		const ws = new WebSocket(`ws://25.45.252.73:8000/match/${matchId}/`);
+
+		ws.onopen = () => {
+			console.log(`Conectado ao WebSocket da partida: ${matchId}`);
+		};
+
+		ws.onmessage = (message) => {
+			console.log("Mensagem recebida do WebSocket:", message.data);
+			// Aqui você pode atualizar o estado do jogo baseado nas mensagens recebidas
+		};
+
+		ws.onclose = () => {
+			console.log(`WebSocket da partida ${matchId} desconectado`);
+		};
+
+		ws.onerror = (error) => {
+			console.error("Erro no WebSocket:", error);
+		};
+
+		// Iniciar o jogo Pong
+		startPong(mainId);
 	} catch (error) {
-		console.error('Error:', error);
+		console.error('Erro ao iniciar o jogo:', error);
 	}
 }
 
@@ -82,7 +122,7 @@ function startPong() {
 			<button id="logoutButton" style="color: black; margin: 10px 0; padding: 5px;">Logout</button>
 		</div>
 	`;
-	
+
 	const canvas = document.createElement("canvas");
 	canvas.width = 800;
 	canvas.height = 600;
@@ -205,4 +245,4 @@ function startGameLoop(canvas) {
 }
 
 // Iniciar a renderização da tela de login
-renderLogin("main-div");
+renderLogin();

@@ -9,70 +9,135 @@ app.use(express.json());
 app.use(cors());
 
 // Simula uma lista de logins ativos (no mundo real, isso seria gerenciado de forma mais segura e persistente)
-let activeLogins = [];
+let accountList = [];
 
 // Função para gerar o Bearer Token
-function generateBearerToken(payload) {
-    // Defina o tempo de expiração do token (opcional, por exemplo, 1 hora)
-    const options = { expiresIn: '1h' };
+function generateToken(payload) {
+    // Defina o tempo de expiração do token para 1 dia
+    const options = { expiresIn: '1d' };
 
     // Gera o token com a carga útil (payload), a chave secreta e as opções
     const token = jwt.sign(payload, secretKey, options);
 
     // Retorna o token no formato Bearer
-    return `Bearer ${token}`;
+    return token;
 }
 
-// Rota GET - Retorna a lista de logins ativos no momento
-app.get('/login', (req, res) => {
-    res.json(activeLogins);
-});
+// Get payload from token
+function	extractPayload(token) {
+	const payload = {
+		data: null,
+		status: false,
+		error: null,
+	};
 
-// Rota POST - Adiciona um novo login
-app.post('/login', (req, res) => {
-    const { username } = req.body;
+	try {
+		payload.data = jwt.verify(token, secretKey);
+		payload.status = true;
+		return payload;
+	}
+	catch (error)
+	{
+		payload.error = error.name;
+		return payload;
+	}
+}
 
-    if (!username) {
-        return res.status(400).json({ message: 'Username is required' });
-    }
+function	isUserRegistered(username) {
+	return accountList.some((login) => login.username === username);
+}
 
-    // Verifica se o usuário já está logado
-    const userAlreadyLoggedIn = activeLogins.some((login) => login.username === username);
-    if (userAlreadyLoggedIn) {
-        return res.status(400).json({ message: 'User is already logged in' });
-    }
-
+function	registerUser(username) {
 	const loginData = {
 		username: username,
-		id:	activeLogins.length + 1,
+		email: `${username}@example.com`,
+		id:	accountList.length + 1,
 	}
 
 	// Gera o token de autenticação
-	const token = generateBearerToken(loginData);
-	loginData.token = token;
+	const token = generateToken(loginData);
 
     // Adiciona o novo login à lista de logins ativos
-    activeLogins.push(loginData);
-    res.status(201).json({ message: loginData });
+    accountList.push(loginData);
+	return token;
+}
+
+// Rota GET - Retorna a lista de logins ativos no momento
+app.get('/account', (req, res) => {
+    res.status(200).json({ data: accountList });
 });
 
-// Rota DELETE - Remove um login (Logout)
-app.delete('/logout', (req, res) => {
+app.get('/user/:token', (req, res) => {
+	const { token } = req.params;
+	const payload = extractPayload(token);
+
+	if (!payload.status) {
+		return res.status(404).json({ error: payload.error });
+	}
+
+	res.status(200).json({ data: payload.data });
+})
+
+app.post('/login', (req, res) => {
+	const { username } = req.body;
+	let	token;
+
+	if (!username) {
+        return res.status(400).json({ error: 'Username is required' });
+    }
+
+    // Verifica se o usuário já está logado
+    const userAlreadyExists = isUserRegistered(username);
+    if (!userAlreadyExists) {
+		// redirect to register
+		token = registerUser(username);
+    }
+	else
+	{
+		const loginData = accountList.find((login) => login.username === username);
+		token = generateToken(loginData);
+	}
+	
+	res.status(201).json({ data: token });
+});
+
+// Rota POST - Adiciona um novo login
+app.post('/register', (req, res) => {
     const { username } = req.body;
 
     if (!username) {
-        return res.status(400).json({ message: 'Username is required' });
+        return res.status(400).json({ error: 'Username is required' });
     }
 
+    // Verifica se o usuário já está logado
+    const userAlreadyExists = isUserRegistered(username);
+    if (userAlreadyExists) {
+        return res.status(400).json({ error: 'User is already registered' });
+    }
+
+	const token = registerUser(username);
+
+    res.status(201).json({ data: token });
+});
+
+// Rota DELETE - Remove um login (Logout)
+app.delete('/delete/:token', (req, res) => {
+    const { token } = req.params;
+	const payload = extractPayload(token);
+
+	if (!payload.status) {
+		return res.status(404).json({ error: payload.error });
+	}
+
     // Verifica se o usuário está logado
-    const index = activeLogins.findIndex((login) => login.username === username);
+    const index = accountList.findIndex((login) => login.username === payload.data.username);
     if (index === -1) {
-        return res.status(404).json({ message: 'User is not logged in' });
+        return res.status(404).json({ error: 'User is not logged in' });
     }
 
     // Remove o usuário da lista de logins ativos
-    activeLogins.splice(index, 1);
-	return res.status(201).json({ message: `User ${username} logged out successfully` });
+    accountList.splice(index, 1);
+	return res.status(201).json({ message: `User ${payload.data.username} has been successfully deleted` });
 });
 
 // Inicia o servidor

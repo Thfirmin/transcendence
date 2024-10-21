@@ -1,6 +1,6 @@
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-import uuid, json
+import uuid, json, random
 match_list = []
 tournament_list = []
 
@@ -22,10 +22,27 @@ def	match(request):
 def	match_get(request):
 	return JsonResponse(match_list, safe=False)
 
+# GET /pong/match/<match_id>
+# Get match details
+def	match_id(request, match_id):
+	for match in match_list:
+		if match["id"] == match_id:
+			return JsonResponse(match)
+	return HttpResponse('Match not found')
+
 # POST /pong/match
 # Subscribe to a match
 def	match_post(request):
-	player = json.loads(request.body)
+	body = json.loads(request.body)
+	player = {
+		"username": body["username"],
+		"token": body["token"],
+		"paddle": {
+			"width": 10,
+			"height": 50,
+			"position": 0.5
+		}
+	}
 	for match in match_list:
 		if match["player2"] == None:
 			match["player2"] = player
@@ -37,6 +54,18 @@ def	match_post(request):
 		"status": "pending",
 		"player1": player,
 		"player2": None,
+		"ball": {
+			"size": 4,
+			"position": {
+				"x": 0.5,
+				"y": 0.5
+			},
+			"speed": 0,
+			"direction": {
+				"x": random.choice([1, -1]),
+				"y": 0
+			}
+		}
 	})
 	return HttpResponse(str(match_id))
 
