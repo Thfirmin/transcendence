@@ -25,7 +25,12 @@ SECRET_KEY = 'django-insecure-s(!*r63bf$qch3dl4@$7e^+2zyap4on2_0se$0y+15v6il%0a&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+	'localhost',
+	'127.0.0.1',
+	'25.45.252.73',
+	'25.57.177.253',
+]
 
 
 # Application definition
@@ -85,7 +90,6 @@ CHANNEL_LAYERS = {
         },
     },
 }
-
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases

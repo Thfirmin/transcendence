@@ -1,94 +1,13 @@
+const user = {}
 const mainId = "main-div";
-let LoginData; // Dados de login do usuário
-
-// Função para obter os dados de login do localStorage
-async function getLoginData() {
-	const token = localStorage.getItem('token');
-	if (!token) return null;
-
-	try {
-		const response = await fetch(`http://25.45.252.73:3001/user/${token}`);
-		const loginData = await response.json();
-		console.log("getLoginData: ", loginData.data);
-		return loginData.data;
-	} catch (error) {
-		console.error('Erro ao buscar dados de login:', error);
-		return null;
-	}
-}
-
-// Função para renderizar o formulário de login ou o jogo dependendo do estado
-function renderLogin() {
-	getLoginData().then(data => {
-		if (data) {
-			LoginData = data;
-			BeginGame(); // Se já estiver logado, iniciar o jogo
-			return;
-		}
-
-		const login = document.getElementById(mainId);
-		login.innerHTML = `
-			<div style="text-align: center; max-width: 300px; margin: 0 auto;">
-				<h1>Login</h1>
-				<input type="text" id="username" placeholder="Username" style="color: black; margin: 10px 0; padding: 5px;">
-				<button id="loginButton" style="color: black; margin: 10px 0; padding: 5px;">Login</button>
-			</div>
-		`;
-
-		// Adicionando evento ao botão de login de forma mais limpa
-		document.getElementById('loginButton').addEventListener('click', onLogin);
-	});
-}
-
-// Função de login com async/await
-async function onLogin() {
-	const username = document.getElementById('username').value;
-	try {
-		const response = await fetch('http://25.45.252.73:3001/login/', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ username })
-		});
-
-		if (response.status === 201) {
-			const data = await response.json();
-			localStorage.setItem('token', data.data);
-			LoginData = data.data;
-			BeginGame(); // Iniciar o jogo após o login
-		} else {
-			alert('Login falhou');
-		}
-	} catch (error) {
-		console.error('Erro no login:', error);
-	}
-}
-
-// Função de logout
-function onLogout() {
-	localStorage.removeItem('token');
-	console.log('Logout successful');
-	renderLogin(); // Retornar à tela de login
-}
+const hostname = '25.45.252.73'
 
 // Função para iniciar o jogo após conectar-se à API e ao WebSocket
 async function BeginGame() {
 	try {
-		// Conectar na API geradora de salas e obter o matchId
-		const response = await fetch('http://25.45.252.73:8000/pong/match/', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				username: LoginData.username,
-				token: localStorage.getItem('token')
-			})
-		});
-
-		const data = await response.json();
-		console.log("Match data: ", data);
-
 		// Conectar ao WebSocket com o matchId retornado pela API
-		const matchId = data.matchId;
-		const ws = new WebSocket(`ws://25.45.252.73:8000/match/${matchId}/`);
+		const matchId = user.matchId;
+		const ws = new WebSocket(`ws://${hostname}:8000/ws/match/${matchId}/`);
 
 		ws.onopen = () => {
 			console.log(`Conectado ao WebSocket da partida: ${matchId}`);
@@ -117,20 +36,12 @@ async function BeginGame() {
 // Função para iniciar o jogo Pong
 function startPong() {
 	const container = document.getElementById(mainId);
-	container.innerHTML = `
-		<div style="text-align: center; max-width: 300px; margin: 0 auto;">
-			<button id="logoutButton" style="color: black; margin: 10px 0; padding: 5px;">Logout</button>
-		</div>
-	`;
 
 	const canvas = document.createElement("canvas");
 	canvas.width = 800;
 	canvas.height = 600;
 	canvas.classList.add("pong-game");
 	container.appendChild(canvas);
-
-	// Associando o botão de logout
-	document.getElementById('logoutButton').addEventListener('click', onLogout);
 
 	// Iniciar o loop do jogo Pong
 	startGameLoop(canvas);
@@ -244,5 +155,44 @@ function startGameLoop(canvas) {
 	setInterval(draw, 1000 / 60);
 }
 
-// Iniciar a renderização da tela de login
-renderLogin();
+async function getMatch(username, token)
+{
+	const requestData = {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({ username, token }),
+	};
+	const response = await fetch(`http://${hostname}:8000/pong/matchmaker/`, requestData);
+	const data = await response.json();
+	return data.match_id;
+}
+
+// generate a random username for the user
+async function login() {
+	user.username = `user-${Math.floor(Math.random() * 1000)}`;
+
+	const requestData = {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({ username: user.username })
+	};
+
+	const response = await fetch(`http://${hostname}:8000/pong/login/`, requestData);
+	const data = await response.json();
+	user.token = data.token;
+	user.matchId = await getMatch(user.username, user.token);
+}
+
+login().then(
+	(response) => {
+		console.log("You've been succefully logged in!!! XD");
+		console.log("username:", user.username);
+		console.log("token:", user.token);
+		console.log("matchId:", user.matchId);
+		BeginGame();
+	}
+)
