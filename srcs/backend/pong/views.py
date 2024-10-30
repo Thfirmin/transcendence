@@ -1,30 +1,46 @@
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-import uuid, json, random
+import uuid, json, random, jwt, datetime
+
 match_list = []
 tournament_list = []
+secretKey = "pvieira--tde-souz-thfirmin-vchastin"
+
+@csrf_exempt
+def login(request):
+	# get body request and generate jwt token
+	body = json.loads(request.body)
+	payload = {
+		"exp": datetime.datetime.utcnow() + datetime.timedelta(days=1),
+		"username": body["username"],
+	}
+	token = jwt.encode(payload, secretKey, algorithm="HS256")
+	return JsonResponse({"token": token})
+
+
+
 
 # Create your views here.
 # # /pong/match/<match_id>
 @csrf_exempt
-def	match(request):
+def	matchmaker(request):
 	if request.method == 'GET':
-		return match_get(request)
+		return matchmaker_get(request)
 	elif request.method == 'POST':
-		return match_post(request)
+		return matchmaker_post(request)
 	elif request.method == 'DELETE':
-		return match_delete(request)
+		return matchmaker_delete(request)
 
 	return HttpResponse('Hello, World')
 
 # GET /pong/match
 # Get match list
-def	match_get(request):
+def	matchmaker_get(request):
 	return JsonResponse(match_list, safe=False)
 
 # GET /pong/match/<match_id>
 # Get match details
-def	match_id(request, match_id):
+def	matchmaker_id(request, match_id):
 	for match in match_list:
 		if match["id"] == match_id:
 			return JsonResponse(match)
@@ -32,7 +48,7 @@ def	match_id(request, match_id):
 
 # POST /pong/match
 # Subscribe to a match
-def	match_post(request):
+def	matchmaker_post(request):
 	body = json.loads(request.body)
 	player = {
 		"username": body["username"],
@@ -47,7 +63,7 @@ def	match_post(request):
 		if match["player2"] == None:
 			match["player2"] = player
 			match["status"] = "in_progress"
-			return HttpResponse(str(match["id"]))
+			return JsonResponse({ "match_id": match["id"] }, safe=False)
 	match_id = uuid.uuid4()
 	match_list.append({
 		"id": match_id,
@@ -67,11 +83,12 @@ def	match_post(request):
 			}
 		}
 	})
-	return HttpResponse(str(match_id))
+	return JsonResponse({ "match_id": match_id }, safe=False)
+	
 
 # DELETE /pong/match
 # Unsubscribe from a match
-def	match_delete(request):
+def	matchmaker_delete(request):
 	player = json.loads(request.body)
 	for match in match_list:
 		if match["player1"] == player or match["player2"] == player:

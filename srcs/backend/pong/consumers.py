@@ -1,5 +1,7 @@
 import asyncio
 from channels.generic.websocket import AsyncWebsocketConsumer
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 import json
 
 # receber uma mensagem, adicionar ao array e enviar tudo que foi guardado
@@ -39,13 +41,16 @@ import json
 # 			self.channel_name
 # 		)
 
+#@method_decorator(csrf_exempt, name='dispatch')
 class	PongConsumer(AsyncWebsocketConsumer):
 	# Entrar na sala do jogo
 	async def connect(self):
 		# array de players
 		self.players = []
 		# Enrar na sala do channel
+		#self.room_group_name = "pla"
 		self.room_group_name = self.scope['url_route']['kwargs']['id']
+		self.players.append(self)
 		await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 		# aceitar conexão
 		await self.accept()
