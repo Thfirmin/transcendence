@@ -1,0 +1,50 @@
+#!/bin/bash
+
+# Texto de entrada
+list="$@"
+remove="--rm"
+name=
+envfile=
+envvar=
+
+# Declarar um array associativo
+declare -A argv
+
+# Transformar o texto em um array associativo
+for pair in $list; do
+    key="${pair%%=*}"      # Parte antes do '='
+    value="${pair#*=}"       # Parte após o '='
+    argv["$key"]="$value"
+done
+
+if [ -z "${argv[img]}" ]; then
+	echo "Erro: Image not found" &> /dev/stderr
+	exit 1
+fi
+
+if [ "${argv[rm]}" == "false" ]; then
+	remove=
+fi
+
+if [ -n "${argv[name]}" ]; then
+	name="--name ${argv[name]}"
+fi
+
+if [ -n "${argv[envfile]}" ]; then
+	envfile="--env-file ${argv[envfile]}"
+fi
+
+if [ -n "${argv[env]}" ]; then
+	ifs_backup=$IFS
+	IFS=','
+	for pair in ${argv[env]}; do
+    	key="${pair%%:*}" # Parte antes do ':'
+    	value="${pair#*:}" # Parte após o ':'
+		value=${value:+"=$value"}
+		envvar+="--env ${key}${value} "
+	done
+	IFS=$ifs_backup
+fi
+
+${argv["docker"]} run ${remove} -it ${envvar} ${envfile} ${name} ${argv["img"]}
+

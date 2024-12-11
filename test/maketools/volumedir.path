@@ -1,0 +1,6 @@
+# The root basedirname of volume
+VOLROOT="${HOME}"
+# The name of volume directory
+VOLNAME=".data"
+# Subdirectories (format: "sub1 sub2 sub1/subsub1 ..")
+VOLSUBDIR="database"

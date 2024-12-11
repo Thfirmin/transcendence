@@ -1,0 +1,55 @@
+#!/bin/bash
+
+VOLROOT=
+VOLNAME=
+VOLSUBDIR=
+
+configfile="maketools/volumedir.path"
+
+if [ ! -d "maketools" ]; then
+	echo "maketools directory not found!" > /dev/stderr
+fi
+
+if [ -f "${configfile}"  ]; then
+	source maketools/volumedir.path
+
+	if [[ -z "${VOLROOT}" || -z "${VOLNAME}" ]]; then
+		echo "'${VOLROOT}'/'${VOLNAME}': Invalid path!"
+		exit 1
+	fi
+elif [ "$1" != "gen" ]; then
+	echo "maketools/volumedir.path: File not found. Use 'make genvol' to generate volume path config file" > /dev/stderr
+	exit 1
+fi
+
+
+if [ "$1" = "up" ]; then
+	if [ -d "${VOLROOT}/${VOLNAME}" ]; then
+		exit 0
+	fi
+	read -p "The directory '${VOLROOT}/${VOLNAME}' will be created. Coninue? [N/y]: "
+	if [[ "$REPLY" != "y" && "$REPLY" != "Y" ]]; then
+		exit 0
+	fi
+	mkdir -p "${VOLROOT}/${VOLNAME}"
+	for subdir in ${VOLSUBDIR}; do
+		mkdir -p "${VOLROOT}/${VOLNAME}/${subdir}"
+	done
+elif [ "$1" = "down" ]; then
+	if [ ! -d "${VOLROOT}/${VOLNAME}" ]; then
+		exit 0
+	fi
+	read -p "The directory '${VOLROOT}/${VOLNAME}' will be deleted. Continue? [N/y]: "
+	if [[ "$REPLY" != "y" && "$REPLY" != "Y" ]]; then
+		exit 0
+	fi
+	sudo rm -rf ${VOLROOT}/${VOLNAME}
+elif [ "$1" = "gen" ]; then
+	echo "Generating volume directory config file..."
+	echo -e "# The root basedirname of volume\nVOLROOT=\n# The name of volume directory\nVOLNAME=\n# Subdirectories (format: \"sub1 sub2 sub1/subsub1 ..\")\nVOLSUBDIR=" > maketools/volumedir.path
+	echo "Volume directory config file generated!"
+else
+	echo "Invalid parameter. Use 'up', 'down' or 'gen' argument to create/delete/generate volumes." > /dev/stderr
+	exit 2
+fi
+
