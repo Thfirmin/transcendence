@@ -1,0 +1,70 @@
+/----------| [35mFT_TRANSCENDENCE - MAKEFILE HELP[0m |----------\
+
+[3mUsage: make [<rule>] [arg=value ...][0m
+
+<><{[[7m   MANDATORY RULES    [0m]}><>   
+	- [33mall[0m -> (default rule): 
+	- [33m${NAME}[0m -> (default: 'ft_transcendence'): 
+	- [33mclean[0m: 
+	- [33mfclean[0m: 
+	- [33mre[0m: 
+
+<><{[[7m DOCKER COMPOSE RULES [0m]}><>
+	- [33mup[0m: Initiate all docker compose services
+		arguments:
+			[35m*[0m id: Apply on a specific service if 'id' is setted
+	- [33mdown[0m: Finish all docker compose services
+		arguments:
+			[35m*[0m id: Apply on a specific service if 'id' is setted
+	- [33mprune[0m: Finish all docker compose services and delete unused resources
+	- [33mstart[0m: Start all stopped services
+		arguments:
+			[35m*[0m id: Apply on a specific service if 'id' is setted
+	- [33mstop[0m: Stop all started services
+		arguments:
+			[35m*[0m id: Apply on a specific service if 'id' is setted
+	- [33mrestart[0m: Restart all services
+		arguments:
+			[35m*[0m id: Apply on a specific service if 'id' is setted
+	- [33mpause[0m: Pause all unpaused services
+		arguments:
+			[35m*[0m id: Apply on a specific service if 'id' is setted
+	- [33munpause[0m: Unpause all paused services
+		arguments:
+			[35m*[0m id: Apply on a specific service if 'id' is setted
+
+<><{[[7m     DOCKER RULES     [0m]}><>    
+	- [33mbuild[0m: Build a Dockerfile to an image
+		arguments:
+			[35m*[0m path [required]: Dockerfile path to be builded
+	- [33mrun[0m: Create a docker container from an image and execute it
+		arguments:
+			[35m*[0m img [required]: Image to be runned
+			[35m*[0m name: Name of container
+			[35m*[0m env: Environment variables to insert on running container. (format of argument is <key1>:<value1>,<key2>:<value2>,<key3>:<value3>... in a single string)
+			[35m*[0m envfile: Path of a environment variable (syntax format find on a file generally called '.env')
+			[35m*[0m rm: if you don't want tha container be deleted after you finish your use, set 'rm' argument as 'false'
+	- [33mpurge[0m: Delete ALL docker's data (containers, images, networks, volumes and resources). If you just want to delete non used resource of docker, user 'down' or 'prune' rule
+	- [33mrmc[0m: Delete all docker containers (either running and stopped docker containers)
+	- [33mrmi[0m: Delete all docker images (call 'rmc' rule before it)
+	- [33mrmv[0m: Delete all docker volumes (call 'rmc' rule before it)
+	- [33mrmn[0m: Delete all docker networks
+
+<><{[[7m     UTILS RULES      [0m]}><>     
+	- [33mimg[0m: List images
+	- [33mimgall[0m: List images and hashes tags
+	- [33mcont[0m: List activated containers
+	- [33mcontall[0m: List all containers (both activated and exited)
+	- [33mnet[0m: List user created networks
+	- [33mnetall[0m: List both standard networks and user created networks
+	- [33mvol[0m: List volumes
+	- [33mdebug[0m: Uses 'img', 'contall', 'net' and 'vol' rules
+	- [33mdebugall[0m: Uses 'imgall', 'contall', 'netall' and 'vol' rules
+	- [33mlog[0m: Get a container log history (use 'id' argument to specify container)
+	- [33mplug[0m: Enter in a container (use 'id' argument to specify container)
+	- [33mhelp[0m: Get help text
+
+[2;3m
+ft_transcendence © 2024, 42 school (Rio) Project.
+Maded by Pablo Vieira (pvieira-), Thawan Camara (tde-souz), Thiago Firmino (thfirmin) and Vanessa Chastinet (vchastin).
+[0m

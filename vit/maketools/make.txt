@@ -1,0 +1,70 @@
+/----------| \033[35mFT_TRANSCENDENCE - MAKEFILE HELP\033[0m |----------\
+
+\033[3mUsage: make [<rule>] [arg=value ...]\033[0m
+
+<><{[\033[7m   MANDATORY RULES    \033[0m]}><>   
+	- \033[33mall\033[0m -> (default rule): 
+	- \033[33m${NAME}\033[0m -> (default: 'ft_transcendence'): 
+	- \033[33mclean\033[0m: 
+	- \033[33mfclean\033[0m: 
+	- \033[33mre\033[0m: 
+
+<><{[\033[7m DOCKER COMPOSE RULES \033[0m]}><>
+	- \033[33mup\033[0m: Initiate all docker compose services
+		arguments:
+			\033[35m*\033[0m id: Apply on a specific service if 'id' is setted
+	- \033[33mdown\033[0m: Finish all docker compose services
+		arguments:
+			\033[35m*\033[0m id: Apply on a specific service if 'id' is setted
+	- \033[33mprune\033[0m: Finish all docker compose services and delete unused resources
+	- \033[33mstart\033[0m: Start all stopped services
+		arguments:
+			\033[35m*\033[0m id: Apply on a specific service if 'id' is setted
+	- \033[33mstop\033[0m: Stop all started services
+		arguments:
+			\033[35m*\033[0m id: Apply on a specific service if 'id' is setted
+	- \033[33mrestart\033[0m: Restart all services
+		arguments:
+			\033[35m*\033[0m id: Apply on a specific service if 'id' is setted
+	- \033[33mpause\033[0m: Pause all unpaused services
+		arguments:
+			\033[35m*\033[0m id: Apply on a specific service if 'id' is setted
+	- \033[33munpause\033[0m: Unpause all paused services
+		arguments:
+			\033[35m*\033[0m id: Apply on a specific service if 'id' is setted
+
+<><{[\033[7m     DOCKER RULES     \033[0m]}><>    
+	- \033[33mbuild\033[0m: Build a Dockerfile to an image
+		arguments:
+			\033[35m*\033[0m path [required]: Dockerfile path to be builded
+	- \033[33mrun\033[0m: Create a docker container from an image and execute it
+		arguments:
+			\033[35m*\033[0m img [required]: Image to be runned
+			\033[35m*\033[0m name: Name of container
+			\033[35m*\033[0m env: Environment variables to insert on running container. (format of argument is <key1>:<value1>,<key2>:<value2>,<key3>:<value3>... in a single string)
+			\033[35m*\033[0m envfile: Path of a environment variable (syntax format find on a file generally called '.env')
+			\033[35m*\033[0m rm: if you don't want tha container be deleted after you finish your use, set 'rm' argument as 'false'
+	- \033[33mpurge\033[0m: Delete ALL docker's data (containers, images, networks, volumes and resources). If you just want to delete non used resource of docker, user 'down' or 'prune' rule
+	- \033[33mrmc\033[0m: Delete all docker containers (either running and stopped docker containers)
+	- \033[33mrmi\033[0m: Delete all docker images (call 'rmc' rule before it)
+	- \033[33mrmv\033[0m: Delete all docker volumes (call 'rmc' rule before it)
+	- \033[33mrmn\033[0m: Delete all docker networks
+
+<><{[\033[7m     UTILS RULES      \033[0m]}><>     
+	- \033[33mimg\033[0m: List images
+	- \033[33mimgall\033[0m: List images and hashes tags
+	- \033[33mcont\033[0m: List activated containers
+	- \033[33mcontall\033[0m: List all containers (both activated and exited)
+	- \033[33mnet\033[0m: List user created networks
+	- \033[33mnetall\033[0m: List both standard networks and user created networks
+	- \033[33mvol\033[0m: List volumes
+	- \033[33mdebug\033[0m: Uses 'img', 'contall', 'net' and 'vol' rules
+	- \033[33mdebugall\033[0m: Uses 'imgall', 'contall', 'netall' and 'vol' rules
+	- \033[33mlog\033[0m: Get a container log history (use 'id' argument to specify container)
+	- \033[33mplug\033[0m: Enter in a container (use 'id' argument to specify container)
+	- \033[33mhelp\033[0m: Get help text
+
+\e[2;3m
+ft_transcendence © 2024, 42 school (Rio) Project.
+Maded by Pablo Vieira (pvieira-), Thawan Camara (tde-souz), Thiago Firmino (thfirmin) and Vanessa Chastinet (vchastin).
+\e[0m
